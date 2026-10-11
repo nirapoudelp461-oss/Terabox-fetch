@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080b14">
+<title>TeraBox Hardcore Fetcher</title>
+<style>
+:root{color-scheme:dark;--bg:#080b14;--panel:#111827;--line:#29364e;--text:#f4f6ff;--muted:#9ba9c0;--blue:#6578ff;--cyan:#3ce1ff;--green:#49dda8;--red:#ff7386}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#263a78 0,transparent 55%),var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:11px;padding:12px 15px;background:#1b2940;color:white;font-weight:700}button:disabled{opacity:.6;cursor:wait}
+.container{width:min(950px,calc(100% - 24px));margin:auto;padding:32px 0 45px}header{text-align:center;margin-bottom:25px}
+.logo{display:grid;place-items:center;width:68px;height:68px;margin:0 auto 15px;border-radius:22px;background:linear-gradient(140deg,var(--blue),var(--cyan));font-size:33px;box-shadow:0 0 35px #6578ff35}
+h1{margin:0 0 10px;font-size:clamp(27px,5vw,39px)}.gradient{background:linear-gradient(90deg,#9ba8ff,#3ce1ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+header p{max-width:620px;margin:auto;color:var(--muted);line-height:1.7;font-size:14px}.panel{padding:20px;border:1px solid var(--line);background:#111827ef;border-radius:17px;margin-bottom:17px;box-shadow:0 15px 40px #0002}
+.panel-title{font-size:18px;font-weight:800;margin-bottom:8px}.muted{color:var(--muted);font-size:13px;line-height:1.7}
+textarea{display:block;width:100%;min-height:125px;padding:14px;resize:vertical;border-radius:11px;border:1px solid #33415b;outline:none;background:#080d18;color:var(--text);line-height:1.7;overflow-wrap:anywhere}
+textarea:focus{border-color:var(--blue)}.label{display:block;font-size:13px;font-weight:700;margin:18px 0 9px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}.primary{flex:1;min-width:150px;background:linear-gradient(110deg,#6679ff,#4169ec);border-color:transparent}
+.status{display:none;margin-top:15px;padding:12px;border-radius:10px;font-size:13px;line-height:1.7;overflow-wrap:anywhere;white-space:pre-wrap}
+.status.show{display:block}.status.info{background:#6478ff17;border:1px solid #6478ff55;color:#c5ceff}.status.ok{background:#49dda812;border:1px solid #49dda855;color:#91f2cc}.status.error{background:#ff738612;border:1px solid #ff738655;color:#ffb3be}
+.hidden{display:none!important}.result-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.count{background:#253553;color:#c8d3ff;padding:7px 10px;border-radius:8px;font-size:12px}
+.file-list{display:grid;gap:15px}.file{min-width:0;overflow:hidden;background:#0a1020;border:1px solid var(--line);border-radius:14px}.preview{background:#050810;min-height:130px}.thumbnail{display:block;width:100%;max-height:330px;aspect-ratio:16/9;object-fit:contain}.no-image{display:grid;place-items:center;min-height:145px;font-size:40px;color:var(--cyan)}
+.file-body{padding:16px}.file-name{font-size:17px;font-weight:800;line-height:1.5;overflow-wrap:anywhere;margin-bottom:12px}.tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}.tag{font-size:12px;padding:6px 9px;border:1px solid #30415d;background:#17233a;color:#cad5ef;border-radius:7px}.tag.type{color:#8ef1c9}
+.meta{display:grid;gap:10px}.meta-row{display:grid;grid-template-columns:95px minmax(0,1fr);gap:10px;font-size:13px;line-height:1.6}.meta-label{color:var(--muted)}.meta-value{min-width:0;overflow-wrap:anywhere}
+.link-box{margin-top:13px;padding:12px;border-radius:10px;background:#121d30;border:1px solid #293953}.link-label{color:var(--muted);font-size:12px;margin-bottom:7px}.link-value{font-size:12px;line-height:1.6;overflow-wrap:anywhere}.link-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.link-actions button{font-size:12px;padding:9px 11px}
+video{display:block;width:100%;max-height:400px;margin-top:14px;border-radius:10px;background:black}.footer{text-align:center;color:#7e8ca5;font-size:12px;line-height:1.8;margin-top:24px}
+@media(max-width:520px){.container{width:calc(100% - 16px);padding-top:23px}.panel{padding:15px}.actions button{flex:1}.meta-row{grid-template-columns:82px minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<main class="container">
+<header><div class="logo">↗</div><h1>TeraBox <span class="gradient">Fetcher</span></h1><p>Process supported TeraBox share links and short URLs. Retrieve file information, thumbnails, streams and downloads.</p></header>
+<section class="panel">
+<div class="panel-title">Link Fetcher</div><p class="muted">Paste your short link, standard TeraBox URL, or text containing a URL. This tool processes one link at a time.</p>
+<label class="label" for="urlInput">TeraBox link</label>
+<textarea id="urlInput" spellcheck="false" placeholder="https://teraboxlinke.com/x/1gGmrMaFkcz_VUglsfaUJbQ"></textarea>
+<div class="actions"><button class="primary" id="fetchBtn">Fetch Link</button><button id="pasteBtn">Paste</button><button id="clearBtn">Clear</button></div>
+<div id="status" class="status" role="status" aria-live="polite"></div>
+</section>
+<section class="panel hidden" id="resultsPanel">
+<div class="result-header"><div class="panel-title">Results</div><span class="count" id="fileCount">0 files</span></div>
+<div class="muted" id="resolvedInfo" style="margin-bottom:15px;white-space:pre-wrap"></div><div class="file-list" id="fileList"></div>
+</section>
+<footer class="footer">TeraBox Fetcher · Powered by xAPIverse<br>Only accessible links supported by the API can be fetched.</footer>
+</main>
+<script>
+"use strict";
+const $=id=>document.getElementById(id),urlInput=$("urlInput"),fetchBtn=$("fetchBtn"),statusBox=$("status"),resultsPanel=$("resultsPanel"),fileList=$("fileList");
+let activeController=null;
+function status(message,type="info"){statusBox.textContent=message;statusBox.className="status show "+type}
+function clearStatus(){statusBox.textContent="";statusBox.className="status"}
+function extractUrl(text){const m=String(text||"").match(/https?:\/\/[^\s<>"'`]+/i);if(!m)return null;const s=m[0].replace(/[)\]},.!?;:]+$/g,"");try{const u=new URL(s);return ["http:","https:"].includes(u.protocol)?u.href:null}catch{return null}}
+function addText(parent,tag,cls,value){const e=document.createElement(tag);e.className=cls||"";e.textContent=String(value??"");parent.appendChild(e);return e}
+function httpUrl(value){if(typeof value!=="string")return"";try{const u=new URL(value);return["http:","https:"].includes(u.protocol)?u.href:""}catch{return""}}
+function sizeText(f){if(f.size_formatted)return f.size_formatted;const b=Number(f.size);if(!Number.isFinite(b)||b<0)return"Unknown";if(!b)return"0 Bytes";const units=["Bytes","KB","MB","GB","TB"],i=Math.min(Math.floor(Math.log(b)/Math.log(1024)),units.length-1);return(b/Math.pow(1024,i)).toFixed(i?2:0)+" "+units[i]}
+async function copyValue(v){try{await navigator.clipboard.writeText(v);status("Link copied.","ok")}catch{status("Clipboard access was blocked. Copy the displayed URL manually.","error")}}
+function addLink(parent,label,value){const url=httpUrl(value);if(!url)return;const box=document.createElement("div");box.className="link-box";addText(box,"div","link-label",label);addText(box,"div","link-value",url);const actions=document.createElement("div");actions.className="link-actions";const c=addText(actions,"button","","Copy Link");c.type="button";c.onclick=()=>copyValue(url);const o=addText(actions,"button","","Open Link");o.type="button";o.onclick=()=>window.open(url,"_blank","noopener,noreferrer");box.appendChild(actions);parent.appendChild(box)}
+function addMeta(parent,label,value){if(value===undefined||value===null||value==="")return;const r=document.createElement("div");r.className="meta-row";addText(r,"div","meta-label",label);addText(r,"div","meta-value",value);parent.appendChild(r)}
+function renderFile(f,i){const card=document.createElement("article");card.className="file";const preview=document.createElement("div");preview.className="preview";const image=httpUrl(f.thumbnail||f.image||f.thumb);if(image){const img=document.createElement("img");img.className="thumbnail";img.alt=f.name||"File thumbnail";img.loading="lazy";img.referrerPolicy="no-referrer";img.src=image;img.onerror=()=>{img.remove();if(!preview.querySelector(".no-image"))addText(preview,"div","no-image","▶")};preview.appendChild(img)}else addText(preview,"div","no-image","▶");card.appendChild(preview);
+const body=document.createElement("div");body.className="file-body";addText(body,"div","file-name",(i+1)+". "+(f.name||"Unnamed file"));const tags=document.createElement("div");tags.className="tags";addText(tags,"span","tag type",f.type||"file");if(f.quality)addText(tags,"span","tag",f.quality);body.appendChild(tags);
+const meta=document.createElement("div");meta.className="meta";addMeta(meta,"Size",sizeText(f));addMeta(meta,"Duration",f.duration||"Unknown");addMeta(meta,"Quality",f.quality||"Unknown");addMeta(meta,"Type",f.type||"Unknown");addMeta(meta,"File path",f.file_path||"Unknown");body.appendChild(meta);
+addLink(body,"Streaming URL",f.stream_url);addLink(body,"Download URL",f.normal_dlink||f.fast_dlink||f.download_url);addLink(body,"Subtitle URL",f.subtitle_url);
+if(f.fast_stream_url&&typeof f.fast_stream_url==="object")for(const[q,u]of Object.entries(f.fast_stream_url))addLink(body,"Fast Stream · "+q,u);
+const stream=httpUrl(f.stream_url);if(stream&&String(f.type||"").toLowerCase()==="video"){const v=document.createElement("video");v.controls=true;v.preload="none";v.playsInline=true;v.src=stream;body.appendChild(v)}card.appendChild(body);return card}
+function renderResults(data){fileList.replaceChildren();const files=Array.isArray(data.list)?data.list:[];$("fileCount").textContent=files.length+(files.length===1?" file":" files");$("resolvedInfo").textContent="Original: "+(data.original_url||"")+"\nResolved: "+(data.resolved_url||"");if(!files.length)addText(fileList,"div","muted","No files returned. The link may require additional handling or may not be supported by the API.");else files.forEach((f,i)=>fileList.appendChild(renderFile(f,i)));resultsPanel.classList.remove("hidden")}
+async function fetchLink(){const original=extractUrl(urlInput.value);if(!original){status("Enter a valid HTTP or HTTPS URL.","error");return}if(activeController)activeController.abort();activeController=new AbortController();fetchBtn.disabled=true;fetchBtn.textContent="Fetching...";resultsPanel.classList.add("hidden");fileList.replaceChildren();status("Resolving the short link and contacting xAPIverse...","info");try{const response=await fetch("/api/fetch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:original}),signal:activeController.signal});const contentType=response.headers.get("content-type")||"";const data=contentType.includes("application/json")?await response.json().catch(()=>({})):{};if(!response.ok||data.status==="error"){if(response.status===405||!contentType.includes("application/json"))throw new Error("The backend is not connected. Do not open index.html directly or use static-only hosting. Start the Node.js server, then open the server URL (for example http://127.0.0.1:3000). "+(response.status?"HTTP "+response.status:""));throw new Error(data.message||"Request failed: HTTP "+response.status)}renderResults(data);if(data.list&&data.list.length)status("Success. Retrieved "+data.list.length+" file(s).","ok");else status("The API responded, but returned no file entries.","info")}catch(e){if(e.name!=="AbortError")status(e.message||"Could not fetch this link.","error")}finally{fetchBtn.disabled=false;fetchBtn.textContent="Fetch Link";activeController=null}}
+fetchBtn.addEventListener("click",fetchLink);
+$("clearBtn").addEventListener("click",()=>{urlInput.value="";fileList.replaceChildren();resultsPanel.classList.add("hidden");clearStatus()});
+$("pasteBtn").addEventListener("click",async()=>{try{urlInput.value=await navigator.clipboard.readText();status("Pasted from clipboard.","ok")}catch{status("Clipboard unavailable. Use your device's Paste option.","error")}});
+urlInput.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")fetchLink()});
+</script>
+</body>
+</html>
